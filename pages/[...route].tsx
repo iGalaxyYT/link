@@ -4,13 +4,13 @@ import type { RouteData } from '../types/RouteData';
 
 import styles from '../styles/Route.module.scss';
 
-export async function getServerSidePrompts(context: any) {
+export async function getServerSideProps(context: any) {
     const route = context.params.route;
 
     const { data, error } = await supabase
         .from<RouteData>('routes')
-        .select('source, destination')
-        .eq('source', route);
+        .select('*')
+        .match({ source: route });
 
     if (!data) return { notFound: true };
 
@@ -20,9 +20,10 @@ export async function getServerSidePrompts(context: any) {
             permanent: true,
         }
     }
+
 }
 
-export default async function Route({error, message}: any) {
+export default function Route({error, message}: any) {
     return (
         <div className={styles.PageContainer}>
             <div className={styles.textContainer}>
