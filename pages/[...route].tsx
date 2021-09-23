@@ -1,6 +1,6 @@
 import { supabase } from '../lib/initSupabase';
 
-import type { RouteData } from '../types/RouteData';
+import { RouteData } from '../types/RouteData';
 
 import styles from '../styles/Route.module.scss';
 
