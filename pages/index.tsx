@@ -1,5 +1,7 @@
 import { supabase } from '../lib/initSupabase';
-import { Auth, Input } from '@supabase/ui';
+import { getCode } from '../lib/getCode';
+
+import { Auth, Input, Button } from '@supabase/ui';
 
 import { UserData } from '../types/UserData';
 import { RouteData } from '../types/RouteData';
@@ -15,6 +17,7 @@ export default function Home({ props }: any) {
   const router = useRouter();
   const { user } = Auth.useUser();
   const [ userData, setUserData ] = useState<UserData | undefined>(props);
+  const [ errorMessage, setErrorMessage ] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     updateUserData();
@@ -51,8 +54,34 @@ export default function Home({ props }: any) {
           <br />
           <div style={{border: '1px solid black', padding: '20px', borderRadius: '5px', margin: '20px'}}>
             <p>Add New Route</p>
-            <Input label="Source" placeholder="hello-world" />
-            <Input label="Destination" placeholder="https://example.com" />
+            <Input id="sourceInput" label="Source" placeholder="hello-world" descriptionText="Leave blank for a random URL" />
+            <Input id="destinationInput" label="Destination" placeholder="https://example.com" />
+            <br />
+            <p>{errorMessage}</p>
+            <Button onClick={async () => {
+              const source = (document.getElementById('sourceInput') as any)?.value;
+              const destination = (document.getElementById('destinationInput') as any)?.value;
+
+              const { data, error } = await supabase
+                .from<RouteData>('routes')
+                .select('*')
+                .match({ source: source });
+
+              if (data && data[0]) return setErrorMessage('Route already exists');
+
+              await supabase
+                .from('routes')
+                .insert([
+                  {owner: user.id, source: (source === '' ? getCode(6) : source), destination: destination}
+                ]);
+
+              setErrorMessage(undefined);
+              
+              (document.getElementById('sourceInput') as any).value = "";
+              (document.getElementById('destinationInput') as any).value = "";
+
+              updateUserData();
+            }}>Create</Button>
           </div>
           {userData?.routes.map(x => <RouteCard key={x.id} data={x} updateUserData={updateUserData} />)}
         </div>

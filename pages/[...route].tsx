@@ -12,7 +12,7 @@ export async function getServerSideProps(context: any) {
         .select('*')
         .match({ source: route });
 
-    if (!data) return { notFound: true };
+    if (!(data && data[0])) return { notFound: true };
 
     return {
         redirect: {

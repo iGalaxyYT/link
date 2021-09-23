@@ -1,5 +1,5 @@
 import { supabase } from "../lib/initSupabase";
-import { RouteData } from "../types/RouteData"
+import { Button } from '@supabase/ui';
 
 export default function RouteCard({ data, updateUserData }: any) {
     return (
@@ -9,14 +9,15 @@ export default function RouteCard({ data, updateUserData }: any) {
                 <br />
                 Destination: {data.destination}
                 <br />
-                <button onClick={ async () => {
+                <br />
+                <Button onClick={ async () => {
                     await supabase
                         .from('routes')
                         .delete()
                         .eq('id', data.id);
 
                     updateUserData();
-                }}>Delete</button>
+                }} danger={true}>Delete</Button>
             </div>
         </>
     )
