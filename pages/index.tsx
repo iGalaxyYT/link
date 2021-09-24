@@ -14,12 +14,12 @@ import RouteCard from '../components/RouteCard';
 
 import styles from '../styles/Home.module.scss';
 
-export default function Home({ props }: any) {
+export default function Home() {
   const router = useRouter();
   const { user } = Auth.useUser();
   const [ errorMessage, setErrorMessage ] = useState<string | undefined>(undefined);
 
-  const fetcher = (url: string) => fetch('/api/getUser', {
+  const fetcher = (url: string) => fetch(url, {
     headers: {
       'Authentication': (supabase.auth.session()?.access_token as string)
     }
@@ -55,7 +55,7 @@ export default function Home({ props }: any) {
               if (data && data[0]) return setErrorMessage('Route already exists');
 
               await supabase
-                .from('routes')
+                .from<RouteData>('routes')
                 .insert([
                   {owner: user.id, source: (source === '' ? getCode(6) : source), destination: destination}
                 ]);
