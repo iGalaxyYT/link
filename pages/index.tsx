@@ -6,8 +6,9 @@ import { Auth, Input, Button } from '@supabase/ui';
 import { UserData } from '../types/UserData';
 import { RouteData } from '../types/RouteData';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/router';
+import useSWR, { SWRResponse } from 'swr';
 
 import RouteCard from '../components/RouteCard';
 
@@ -16,37 +17,21 @@ import styles from '../styles/Home.module.scss';
 export default function Home({ props }: any) {
   const router = useRouter();
   const { user } = Auth.useUser();
-  const [ userData, setUserData ] = useState<UserData | undefined>(props);
   const [ errorMessage, setErrorMessage ] = useState<string | undefined>(undefined);
 
-  useEffect(() => {
-    updateUserData();
-  }, []);
+  const fetcher = (url: string) => fetch('/api/getUser', {
+    headers: {
+      'Authentication': (supabase.auth.session()?.access_token as string)
+    }
+  }).then((res) => res.json());
 
-  async function updateUserData() {
-    if (!user) return;
-
-    const { data, error } = await supabase
-      .from<RouteData>('routes')
-      .select('*')
-      .match({ owner: user.id });
-
-    console.log(data);
-
-    if (!data) return;
-
-    return setUserData({ id: user?.id, routes: data });
-  }
+  const { data: userData, error: userDataError } = useSWR<UserData>(`/api/getUser`, fetcher);
 
   if (user) {
     return (
       <div className={styles.PageContainer}>
         <div className={styles.ContentContainer}>
           <p>Hello, {user.email}</p>
-          <br />
-          <button onClick={() => {
-            updateUserData();
-          }}>Refresh</button>
           <br />
           <button onClick={() => {
             supabase.auth.signOut();
@@ -79,11 +64,9 @@ export default function Home({ props }: any) {
               
               (document.getElementById('sourceInput') as any).value = "";
               (document.getElementById('destinationInput') as any).value = "";
-
-              updateUserData();
             }}>Create</Button>
           </div>
-          {userData?.routes.map(x => <RouteCard key={x.id} data={x} updateUserData={updateUserData} />)}
+          {userData?.routes.map(x => <RouteCard key={x.id} data={x} />)}
         </div>
       </div>
     )
