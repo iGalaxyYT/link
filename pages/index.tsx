@@ -8,7 +8,7 @@ import { RouteData } from '../types/RouteData';
 
 import { useState } from 'react';
 import { useRouter } from 'next/router';
-import useSWR, { SWRResponse } from 'swr';
+import useSWR from 'swr';
 
 import RouteCard from '../components/RouteCard';
 
