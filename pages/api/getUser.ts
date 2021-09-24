@@ -6,9 +6,6 @@ import { UserData } from '../../types/UserData';
 import { RouteData } from '../../types/RouteData';
 
 export default async function getUser(req: NextApiRequest, res: NextApiResponse<UserData | any>) {
-  console.log(req.headers);
-  console.log(req.headers.authentication);
-
   const userId = (await supabase.auth.api.getUser(req.headers.authentication as string)).user?.id;
 
   const { data, error } = await supabase
