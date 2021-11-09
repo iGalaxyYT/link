@@ -74,7 +74,7 @@ export default function Home() {
     return (
       <div className={styles.PageContainer}>
         <div className={styles.AuthContainer}>
-          <h1>s.igalaxy.dev</h1>
+          <h1>link.igalaxy.dev</h1>
           {
             router.query.error ?
             <h4>Access Denied</h4>
